@@ -37,30 +37,39 @@ public class CustomRequestPreview extends View {
         int height = getHeight();
         middleW = getWidth() / 2;
         middleH = getHeight() / 2;
-
+        int hlfW = 0;
         if (height > width) {
             paddingLR = (int) (width * ratioLR);
             paddingTB = (int) (height * ratioTB);
+            hlfW = paddingLR / 2;
         } else {
             paddingLR = (int) (height * ratioTB);
             paddingTB = (int) (width * ratioLR);
+            hlfW = paddingLR / 4;
         }
 
+        //set light alpha except scan portion
         paint.setColor(Color.parseColor("#60000000"));
         canvas.drawRect(paddingLR, 0, width - paddingLR, paddingTB, paint);//Left
         canvas.drawRect(paddingLR, height - paddingTB, width - paddingLR, height, paint);//Right
         canvas.drawRect(0, 0, paddingLR, height, paint);//Top
         canvas.drawRect(width - paddingLR, 0, width, height, paint);//Bottom
 
-        paint.setColor(Color.parseColor("#ff2196f3"));
-
-        int hlfW = paddingLR / 2;
-        int hlfH = paddingTB / 5;
-        canvas.drawRect(middleW - 1, paddingTB - hlfH, middleW + 2, paddingTB + hlfH, paint);
-        canvas.drawRect(middleW - 1, (height - paddingTB) - hlfH, middleW + 2, (height - paddingTB) + hlfH, paint);
+        //Four sticks
+        paint.setColor(Color.parseColor("#ff8c9eff"));
+        canvas.drawRect(middleW - 1, paddingTB - hlfW, middleW + 2, paddingTB + hlfW, paint);
+        canvas.drawRect(middleW - 1, (height - paddingTB) - hlfW, middleW + 2, (height - paddingTB) + hlfW, paint);
         canvas.drawRect(paddingLR - hlfW, middleH - 1, paddingLR + hlfW, middleH + 2, paint);//Left
         canvas.drawRect((width - paddingLR) - hlfW, middleH - 1, (width - paddingLR) + hlfW, middleH + 2, paint);//Right
 
+        // middle Rect for focusing
+        canvas.drawRect(paddingLR - 1, paddingTB, paddingLR + 2, height - paddingTB, paint);
+        canvas.drawRect((width - paddingLR) - 1, paddingTB, (width - paddingLR) + 2, height - paddingTB, paint);
+        canvas.drawRect(paddingLR, paddingTB - 1, width - paddingLR, paddingTB + 2, paint);
+        canvas.drawRect(paddingLR, (height - paddingTB) - 1, width - paddingLR, (height - paddingTB) + 2, paint);
+
+        //Scan line
+        paint.setColor(Color.parseColor("#ff2196f3"));
         if (scanLine != 0 && isdownward) {
             canvas.drawRect(paddingLR, scanLine - 1, width - paddingLR, scanLine + 2, paint);
             scanLine = scanLine + deductaddValue;
