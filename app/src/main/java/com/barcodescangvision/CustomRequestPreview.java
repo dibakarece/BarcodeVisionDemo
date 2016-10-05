@@ -10,8 +10,8 @@ import android.view.View;
 
 public class CustomRequestPreview extends View {
     private Paint paint = new Paint();
-    private int paddingLR = 0;
-    private int paddingTB = 0;
+    public int paddingLR = 0;
+    public int paddingTB = 0;
     private int middleH = 0;
     private int middleW = 0;
     private float ratioLR = 0.15f;
@@ -27,6 +27,15 @@ public class CustomRequestPreview extends View {
         middleH = getHeight() / 2;
         middleW = getWidth() / 2;
     }
+
+    public int getWD() {
+        return getWidth();
+    }
+
+    public int getHT() {
+        return getHeight();
+    }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
