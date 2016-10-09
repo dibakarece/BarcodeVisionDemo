@@ -1,9 +1,11 @@
 package com.barcodescangvision;
 
 import android.content.Context;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -75,7 +77,7 @@ public class TestClass extends AppCompatActivity {
         mCameraSource = new CameraSource.Builder(context, barcodeDetector)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
                 .setRequestedFps(1)
-                .setRequestedPreviewSize(400, 360)
+                .setRequestedPreviewSize(1600, 1024)
                 .build();
 
         preview.getHolder().addCallback(new SurfaceHolder.Callback() {
@@ -107,18 +109,34 @@ public class TestClass extends AppCompatActivity {
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> items = detections.getDetectedItems();
+
+                if (!isAcceptValue)
+                    return;
+
                 if (items != null && items.size() >= 1) {
-                    final String code = items.valueAt(0).displayValue;
-                    if (!isAcceptValue)
-                        return;
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(TestClass.this, code, Toast.LENGTH_SHORT).show();
-                            isAcceptValue = false;
-                            handler.postDelayed(task, nextDelayTime);
+
+                    for (int i = 0; i < items.size(); i++) {
+                        Barcode barcode = items.valueAt(1);
+                        final String code = barcode.rawValue;
+                        RectF rectF = new RectF(barcode.getBoundingBox());
+
+                        Log.i(TAG, "L: " + rectF.left + "R: " + rectF.right + "T: " + rectF.top + "B: " + rectF.bottom);
+                        Log.i(TAG, "Detected barcode: " + code);
+
+                        if (rectF.left > requestPreview.paddingLR
+                                && rectF.right < (requestPreview.getWD() - requestPreview.paddingLR)
+                                && rectF.top > requestPreview.getHT()
+                                && rectF.bottom < (requestPreview.getHT() - requestPreview.paddingTB)) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(TestClass.this, code, Toast.LENGTH_SHORT).show();
+                                    isAcceptValue = false;
+                                    handler.postDelayed(task, nextDelayTime);
+                                }
+                            });
                         }
-                    });
+                    }
                 }
             }
         });
