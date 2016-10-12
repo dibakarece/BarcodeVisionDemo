@@ -81,7 +81,7 @@ public class TestClass extends AppCompatActivity {
         barcodeDetector = new BarcodeDetector.Builder(context).build();
         mCameraSource = new CameraSource.Builder(context, barcodeDetector)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setRequestedPreviewSize(metrics.widthPixels, metrics.heightPixels)
+                .setRequestedPreviewSize(610,310)
                 .setAutoFocusEnabled(true)
                 .build();
 
