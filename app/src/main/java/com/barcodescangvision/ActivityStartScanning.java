@@ -1,9 +1,14 @@
 package com.barcodescangvision;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -102,17 +107,27 @@ public class ActivityStartScanning extends AppCompatActivity {
         barcodeDetector = new BarcodeDetector.Builder(context).build();
         mCameraSource = new CameraSource.Builder(context, barcodeDetector)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setRequestedFps(1)
+                .setRequestedFps(15)
                 .setRequestedPreviewSize(requestPreview.getWD() - (requestPreview.paddingLR * 2),
                         requestPreview.getHT() - (requestPreview.paddingTB * 2))
+                .setAutoFocusEnabled(true)
                 .build();
 
         preview.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
                 try {
+                    if (ActivityCompat.checkSelfPermission(ActivityStartScanning.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
+                    }
                     mCameraSource.start(preview.getHolder());
-                    requestPreview.setStartScanning(true);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -136,20 +151,58 @@ public class ActivityStartScanning extends AppCompatActivity {
 
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
+//                final SparseArray<Barcode> items = detections.getDetectedItems();
+//                if (items != null && items.size() >= 1) {
+//                    final String code = items.valueAt(0).displayValue;
+//                    if (!isAcceptValue)
+//                        return;
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Toast.makeText(ActivityStartScanning.this, code, Toast.LENGTH_SHORT).show();
+//                            isAcceptValue = false;
+//                            handler.postDelayed(task, nextDelayTime);
+//                            requestPreview.setStartScanning(false);
+//                        }
+//                    });
+//                }
                 final SparseArray<Barcode> items = detections.getDetectedItems();
+
+                if (!isAcceptValue)
+                    return;
+
                 if (items != null && items.size() >= 1) {
-                    final String code = items.valueAt(0).displayValue;
-                    if (!isAcceptValue)
-                        return;
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(ActivityStartScanning.this, code, Toast.LENGTH_SHORT).show();
-                            isAcceptValue = false;
-                            handler.postDelayed(task, nextDelayTime);
-                            requestPreview.setStartScanning(false);
+
+                    for (int i = 0; i < items.size(); i++) {
+                        Barcode barcode = items.valueAt(1);
+                        final String code = barcode.rawValue;
+                        RectF rectF = new RectF(barcode.getBoundingBox());
+
+                        Log.i(TAG, "L: " + rectF.left + " R: " + rectF.right + " T: " + rectF.top + " B: " + rectF.bottom);
+                        Log.i(TAG, "Detected barcode: " + code);
+
+
+                        int rectL = requestPreview.paddingLR;
+                        int rectR = (requestPreview.getWD() - requestPreview.paddingLR);
+                        int rectT = requestPreview.paddingTB;
+                        int rectB = (requestPreview.getHT() - requestPreview.paddingTB);
+
+                        Log.i(TAG, "RectL: " + rectL + " RectR: " + rectR + " RectT: " + rectT + " RectB: " + rectB);
+
+                        if (rectF.left > rectL
+                                && rectF.right < rectR
+                                && rectF.top > rectT
+                                && rectF.bottom < rectB) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(ActivityStartScanning.this, code, Toast.LENGTH_SHORT).show();
+                                    isAcceptValue = false;
+                                    handler.postDelayed(task, nextDelayTime);
+                                }
+                            });
                         }
-                    });
+                    }
                 }
             }
         });

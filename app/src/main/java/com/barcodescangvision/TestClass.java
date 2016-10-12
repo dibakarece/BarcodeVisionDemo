@@ -1,10 +1,14 @@
 package com.barcodescangvision;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
@@ -73,17 +77,28 @@ public class TestClass extends AppCompatActivity {
     };
 
     private void startScanning() {
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
         barcodeDetector = new BarcodeDetector.Builder(context).build();
         mCameraSource = new CameraSource.Builder(context, barcodeDetector)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setRequestedFps(1)
-                .setRequestedPreviewSize(1600, 1024)
+                .setRequestedPreviewSize(metrics.widthPixels, metrics.heightPixels)
+                .setAutoFocusEnabled(true)
                 .build();
 
         preview.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
                 try {
+                    if (ActivityCompat.checkSelfPermission(TestClass.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
+                    }
                     mCameraSource.start(preview.getHolder());
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -123,10 +138,17 @@ public class TestClass extends AppCompatActivity {
                         Log.i(TAG, "L: " + rectF.left + "R: " + rectF.right + "T: " + rectF.top + "B: " + rectF.bottom);
                         Log.i(TAG, "Detected barcode: " + code);
 
-                        if (rectF.left > requestPreview.paddingLR
-                                && rectF.right < (requestPreview.getWD() - requestPreview.paddingLR)
-                                && rectF.top > requestPreview.getHT()
-                                && rectF.bottom < (requestPreview.getHT() - requestPreview.paddingTB)) {
+                        int rectL = requestPreview.paddingLR;
+                        int rectR = (requestPreview.getWD() - requestPreview.paddingLR);
+                        int rectT = requestPreview.paddingTB;
+                        int rectB = (requestPreview.getHT() - requestPreview.paddingTB);
+
+                        Log.i(TAG, "RectL: " + rectL + " RectR: " + rectR + " RectT: " + rectT + " RectB: " + rectB);
+
+                        if (rectF.left > rectL
+                                && rectF.right < rectR
+                                && rectF.top > rectT
+                                && rectF.bottom < rectB) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
