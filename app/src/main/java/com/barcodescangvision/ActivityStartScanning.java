@@ -220,7 +220,13 @@ public class ActivityStartScanning extends AppCompatActivity {
 //
 //           491/248
 //
+//I/ActivityStartScanning: L: 100.0 R: 668.0 T: 206.0 B: 248.0
+//I/ActivityStartScanning: Detected barcode: 00001234560000000018
+//I/ActivityStartScanning: RectL: 201 RectR: 995 RectT: 670 RectB: 491
 //
+//I/ActivityStartScanning: L: 100.0 R: 668.0 T: 206.0 B: 248.0
+//I/ActivityStartScanning: Detected barcode: 00001234560000000018
+//I/ActivityStartScanning: RectL: 201 RectR: 995 RectT: 670 RectB: 491
 //
 //I/ActivityStartScanning: L: 81.0 R: 705.0 T: 198.0 B: 248.0
 //I/ActivityStartScanning: Detected barcode: 00001234560000000018
