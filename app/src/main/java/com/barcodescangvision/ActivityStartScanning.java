@@ -3,10 +3,12 @@ package com.barcodescangvision;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -165,7 +167,64 @@ public class ActivityStartScanning extends AppCompatActivity {
                         }
                     });
                 }
+
+//                final SparseArray<Barcode> items = detections.getDetectedItems();
+//
+//                if (!isAcceptValue)
+//                    return;
+//
+//                if (items != null && items.size() >= 1) {
+//
+//                    for (int i = 0; i < items.size(); i++) {
+//                        Barcode barcode = items.valueAt(1);
+//                        final String code = barcode.rawValue;
+//                        RectF rectF = new RectF(barcode.getBoundingBox());
+//
+//                        Log.i(TAG, "L: " + rectF.left + "R: " + rectF.right + "T: " + rectF.top + "B: " + rectF.bottom);
+//                        Log.i(TAG, "Detected barcode: " + code);
+//
+//                        int rectL = requestPreview.paddingLR;
+//                        int rectR = (requestPreview.getWD() - requestPreview.paddingLR);
+//                        int rectT = requestPreview.paddingTB;
+//                        int rectB = (requestPreview.getHT() - requestPreview.paddingTB);
+//
+//                        Log.i(TAG, "RectL: " + rectL + " RectR: " + rectR + " RectT: " + rectT + " RectB: " + rectB);
+//
+//                        if (rectF.left > rectL
+//                                && rectF.right < rectR
+//                                && rectF.top > rectT
+//                                && rectF.bottom < rectB) {
+//                            runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    Toast.makeText(ActivityStartScanning.this, code, Toast.LENGTH_SHORT).show();
+//                                    isAcceptValue = false;
+//                                    handler.postDelayed(task, nextDelayTime);
+//                                }
+//                            });
+//                        }
+//                    }
+//                }
             }
         });
     }
 }
+
+
+
+//720*1280
+//
+//        179/206
+//
+//        201/100               995/668
+//
+//        491/248
+//
+//
+//
+//        I/ActivityStartScanning: L: 81.0 R: 705.0 T: 198.0 B: 248.0
+//        I/ActivityStartScanning: Detected barcode: 00001234560000000018
+//        I/ActivityStartScanning: RectL: 201 RectR: 995 RectT: 179 RectB: 491
+//        I/ActivityStartScanning: L: 81.0 R: 705.0 T: 198.0 B: 248.0
+//        I/ActivityStartScanning: Detected barcode: 00001234560000000018
+//        I/ActivityStartScanning: RectL: 201 RectR: 995 RectT: 179 RectB: 491
